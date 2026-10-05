@@ -29,32 +29,73 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="card auth">
-      <h1>{mode === 'login' ? 'Login' : 'Create account'}</h1>
-      {error && <div className="alert error">{error}</div>}
-      {notice && <div className="alert success">{notice}</div>}
+    <main className="auth-screen">
+      <section className="auth-aside">
+        <div className="brand">
+          <span className="brand-mark light">S</span>
+          <span>Stockroom</span>
+        </div>
+        <div className="auth-copy">
+          <p className="eyebrow">Your inventory, in good hands</p>
+          <h1>Make room for better business.</h1>
+          <p>A calmer, clearer way to keep track of your products, stock, and the details that keep things moving.</p>
+          <div className="inventory-preview" aria-hidden="true">
+            <div className="preview-heading">
+              <span>Inventory overview</span>
+              <span className="preview-dots"><i /><i /><i /></span>
+            </div>
+            <div className="preview-row">
+              <span className="preview-icon">✳</span>
+              <span className="preview-name">Everyday essentials</span>
+              <span className="preview-meta">In stock</span>
+            </div>
+            <div className="preview-row">
+              <span className="preview-icon">◈</span>
+              <span className="preview-name">Thoughtful goods</span>
+              <span className="preview-meta">Up to date</span>
+            </div>
+          </div>
+        </div>
+        <p className="auth-foot">A little more organized, every day.</p>
+      </section>
 
-      <form onSubmit={submit}>
-        <label>Username
-          <input value={form.username} onChange={set('username')} required autoFocus />
-        </label>
-        {mode === 'register' && (
-          <label>Email
-            <input type="email" value={form.email} onChange={set('email')} required />
-          </label>
-        )}
-        <label>Password
-          <input type="password" value={form.password} onChange={set('password')} required minLength={6} />
-        </label>
-        <button disabled={busy}>{busy ? 'Please wait…' : mode === 'login' ? 'Login' : 'Register'}</button>
-      </form>
+      <section className="auth-main">
+        <div className="auth-panel">
+          <p className="eyebrow">{mode === 'login' ? 'Welcome back' : 'Get started'}</p>
+          <h2>{mode === 'login' ? 'Sign in to Stockroom' : 'Create your account'}</h2>
+          <p className="auth-intro">
+            {mode === 'login'
+              ? 'Enter your details to pick up where you left off.'
+              : 'Create an account to start managing your inventory.'}
+          </p>
+          {error && <div className="alert error" role="alert">{error}</div>}
+          {notice && <div className="alert success" role="status">{notice}</div>}
 
-      <p className="muted">
-        {mode === 'login' ? 'No account yet? ' : 'Already registered? '}
-        <a href="#" onClick={(e) => { e.preventDefault(); setError(''); setMode(mode === 'login' ? 'register' : 'login'); }}>
-          {mode === 'login' ? 'Register' : 'Login'}
-        </a>
-      </p>
-    </div>
+          <form onSubmit={submit}>
+            <label>Username
+              <input autoComplete="username" placeholder="Your username" value={form.username} onChange={set('username')} required autoFocus />
+            </label>
+            {mode === 'register' && (
+              <label>Email address
+                <input type="email" autoComplete="email" placeholder="you@example.com" value={form.email} onChange={set('email')} required />
+              </label>
+            )}
+            <label>Password
+              <input type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} placeholder="Enter your password" value={form.password} onChange={set('password')} required minLength={6} />
+            </label>
+            <button className="auth-submit" disabled={busy}>
+              {busy ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
+            </button>
+          </form>
+
+          <p className="auth-switch">
+            {mode === 'login' ? 'New to Stockroom? ' : 'Already have an account? '}
+            <a href="#" onClick={(e) => { e.preventDefault(); setError(''); setNotice(''); setMode(mode === 'login' ? 'register' : 'login'); }}>
+              {mode === 'login' ? 'Create an account' : 'Sign in'}
+            </a>
+          </p>
+        </div>
+      </section>
+    </main>
   );
 }
