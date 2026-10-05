@@ -5,6 +5,7 @@ import ProductForm from './ProductForm.jsx';
 const peso = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' });
 
 export default function ProductList({ user, onLogout }) {
+  const canManageProducts = user.role === 'admin';
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -61,6 +62,7 @@ export default function ProductList({ user, onLogout }) {
         </div>
         <div className="topbar-right">
           <span className="topbar-label">Your workspace</span>
+          {!canManageProducts && <span className="access-badge">View only</span>}
           <div className="user-chip">
             <span className="avatar">{initials}</span>
             <span className="user-name">{user.username}</span>
@@ -76,9 +78,11 @@ export default function ProductList({ user, onLogout }) {
             <h1>Your products</h1>
             <p className="page-subtitle">A clear view of everything you have in stock.</p>
           </div>
-          <button className="button-primary" onClick={() => setFormFor({})}>
-            <span className="button-plus">+</span> Add product
-          </button>
+          {canManageProducts && (
+            <button className="button-primary" onClick={() => setFormFor({})}>
+              <span className="button-plus">+</span> Add product
+            </button>
+          )}
         </div>
 
         {error && <div className="alert error" role="alert">{error}</div>}
@@ -113,15 +117,15 @@ export default function ProductList({ user, onLogout }) {
             <div className="table-wrap">
               <table>
                 <thead>
-                  <tr><th>Product</th><th>Description</th><th className="num">Price</th><th className="num">In stock</th><th>Added</th><th aria-label="Actions"></th></tr>
+                  <tr><th>Product</th><th>Description</th><th className="num">Price</th><th className="num">In stock</th><th>Added</th>{canManageProducts && <th aria-label="Actions"></th>}</tr>
                 </thead>
                 <tbody>
                   {visibleProducts.length === 0 && (
-                    <tr><td colSpan="6">
+                    <tr><td colSpan={canManageProducts ? 6 : 5}>
                       <div className="empty-state">
                         <span className="empty-icon">{products.length ? '⌕' : '+'}</span>
-                        <strong>{products.length ? 'No matching products' : 'Your inventory starts here'}</strong>
-                        <p>{products.length ? 'Try another name or description.' : 'Add your first product to keep everything organized.'}</p>
+                        <strong>{products.length ? 'No matching products' : canManageProducts ? 'Your inventory starts here' : 'No products yet'}</strong>
+                        <p>{products.length ? 'Try another name or description.' : canManageProducts ? 'Add your first product to keep everything organized.' : 'Products will appear here when they are available.'}</p>
                       </div>
                     </td></tr>
                   )}
@@ -137,12 +141,14 @@ export default function ProductList({ user, onLogout }) {
                       <td className="num">{peso.format(p.price)}</td>
                       <td className="num"><span className={`stock-pill${Number(p.quantity) < 5 ? ' low' : ''}`}>{p.quantity}</span></td>
                       <td className="muted">{p.created_at || '—'}</td>
-                      <td>
-                        <div className="row-actions">
-                          <button className="button-mini" onClick={() => setFormFor(p)}>Edit</button>
-                          <button className="button-mini delete" onClick={() => handleDelete(p)}>Delete</button>
-                        </div>
-                      </td>
+                      {canManageProducts && (
+                        <td>
+                          <div className="row-actions">
+                            <button className="button-mini" onClick={() => setFormFor(p)}>Edit</button>
+                            <button className="button-mini delete" onClick={() => handleDelete(p)}>Delete</button>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -152,7 +158,7 @@ export default function ProductList({ user, onLogout }) {
         </section>
       </main>
 
-      {formFor && (
+      {canManageProducts && formFor && (
         <ProductForm
           product={formFor.id ? formFor : null}
           onSaved={handleSaved}
